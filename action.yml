@@ -15,6 +15,7 @@ runs:
 
     - name: Get latest tag
       id: latestTag
+      continue-on-error: true
       uses: pozetroninc/github-action-get-latest-release@d1dafdb6e338bdab109e6afce581a01858680dfb
       with:
         repository: ${{ inputs.repository }}
@@ -26,11 +27,12 @@ runs:
 
     - name: Generate next version
       id: nextVersion
+      if: steps.latestTag.outcome == 'success'
       run: echo "version=$(./version ${{ steps.extract_branch.outputs.branch }} ${{ steps.latestTag.outputs.release }} ${{ steps.breakingChange.outputs.changed }})" >> $GITHUB_OUTPUT
       shell: bash
 
     - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
-      if: steps.extract_branch.outputs.branch == 'develop'
+      if: steps.extract_branch.outputs.branch == 'develop' && steps.latestTag.outcome == 'success'
       with:
         repo_token: ${{ inputs.token }}
         prerelease: true
@@ -38,12 +40,30 @@ runs:
         title: "${{inputs.releaseTitle}} v${{ steps.nextVersion.outputs.version }}"
 
     - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
-      if: steps.extract_branch.outputs.branch == 'main'
+      if: steps.extract_branch.outputs.branch == 'main' && steps.latestTag.outcome == 'success'
       with:
         repo_token: "${{ inputs.token }}"
         prerelease: false
         automatic_release_tag: v${{ steps.nextVersion.outputs.version }}
         title: "${{inputs.releaseTitle}} v${{ steps.nextVersion.outputs.version }}"
+
+    # If there was any previous release ===============================================================
+
+    - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
+      if: steps.extract_branch.outputs.branch == 'main' && steps.latestTag.outcome != 'success'
+      with:
+        repo_token: "${{ inputs.token }}"
+        prerelease: false
+        automatic_release_tag: v0.1.0
+        title: "${{inputs.releaseTitle}} v0.1.0"
+
+    - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
+      if: steps.extract_branch.outputs.branch == 'develop' && steps.latestTag.outcome != 'success'
+      with:
+        repo_token: ${{ inputs.token }}
+        prerelease: true
+        automatic_release_tag: v0.1.0
+        title: "${{inputs.releaseTitle}} v0.1.0"
 
 inputs:
   repository:
