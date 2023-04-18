@@ -33,7 +33,6 @@ runs:
 
     - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
       if: steps.extract_branch.outputs.branch == 'develop' && steps.latestTag.outcome == 'success'
-      id: release
       with:
         repo_token: ${{ inputs.token }}
         prerelease: true
@@ -42,7 +41,6 @@ runs:
 
     - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
       if: steps.extract_branch.outputs.branch == 'main' && steps.latestTag.outcome == 'success'
-      id: release
       with:
         repo_token: "${{ inputs.token }}"
         prerelease: false
@@ -53,7 +51,6 @@ runs:
 
     - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
       if: steps.extract_branch.outputs.branch == 'main' && steps.latestTag.outcome != 'success'
-      id: release
       with:
         repo_token: "${{ inputs.token }}"
         prerelease: false
@@ -62,7 +59,6 @@ runs:
 
     - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
       if: steps.extract_branch.outputs.branch == 'develop' && steps.latestTag.outcome != 'success'
-      id: release
       with:
         repo_token: ${{ inputs.token }}
         prerelease: true
