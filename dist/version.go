@@ -22,6 +22,31 @@ var (
 	errInvalidVersion   = errors.New("invalid version")
 )
 
+func cleanVersion(s string) (string, error) {
+	// Check if the input string is empty
+	if s == "" {
+		return "", fmt.Errorf("empty string")
+	}
+
+	// Remove any leading or trailing spaces
+	s = strings.TrimSpace(s)
+
+	// Remove any prefix that starts with "v"
+	s = strings.TrimPrefix(s, "v")
+
+	// Remove any suffix that starts with "-"
+	if i := strings.Index(s, "-"); i != -1 {
+		s = s[:i]
+	}
+
+	// Check if the resulting string is empty
+	if s == "" {
+		return "", fmt.Errorf("invalid version number")
+	}
+
+	return s, nil
+}
+
 func runGitCommand(args ...string) (string, error) {
 	cmd := exec.Command("git", args...)
 	output, err := cmd.Output()
@@ -100,7 +125,7 @@ func main() {
 	}
 
 	branchName := os.Args[1]
-	latestReleaseVersion := os.Args[2]
+	latestReleaseVersion, err := cleanVersion(os.Args[2])
 	hasBreakingChange := os.Args[3]
 
 	// Verify that latestReleaseVersion is a valid semantic version
