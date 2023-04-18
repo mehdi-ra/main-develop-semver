@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Release
-        uses: mehdi-ra/next-semver@b7d6e3b296e332c799aa9908d519a48a3ca2d093
+        uses: mehdi-ra/main-develop-semver@a72752066126879a5ca505f0d0a733ed9e9602e1
         with:
           token: ${{secrets.GITHUB_TOKEN}}
           releaseTitle: Auto release
