@@ -47,6 +47,6 @@ jobs:
 | -------------- | ------------------------ |
 | releaseVersion | Token for making release |
 
-## What happens without any previous release?
+## Version fall back
 
-When You add this action to your repository it automatically creates a release with a tag and version v0.1.0. Make sure you are aware of this.
+If the action does not detect any change then creates a release with tag `v0.1.0`
