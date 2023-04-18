@@ -28,8 +28,8 @@ runs:
     - name: Generate next version
       id: nextVersion
       if: steps.latestTag.outcome == 'success'
-      run: echo "version=$(./dist/version ${{ steps.extract_branch.outputs.branch }} ${{ steps.latestTag.outputs.release }} ${{ steps.breakingChange.outputs.changed }})" >> $GITHUB_OUTPUT
-      shell: bash
+      run: echo "version=$(${GITHUB_ACTION_PATH}/dist/version ${{ steps.extract_branch.outputs.branch }} ${{ steps.latestTag.outputs.release }} ${{ steps.breakingChange.outputs.changed }})" >> $GITHUB_OUTPUT
+      shell: sh
 
     - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
       if: steps.extract_branch.outputs.branch == 'develop' && steps.latestTag.outcome == 'success'
