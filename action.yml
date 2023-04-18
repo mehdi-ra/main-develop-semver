@@ -16,9 +16,11 @@ runs:
     - name: Get latest tag
       id: latestTag
       continue-on-error: true
-      uses: pozetroninc/github-action-get-latest-release@d1dafdb6e338bdab109e6afce581a01858680dfb
+      uses: oprypin/find-latest-tag@e1e0e606cc7e9ede25140a5a139b3a5a1b717ece
       with:
         repository: ${{ inputs.repository }}
+        releases-only: true
+        token: ${{inputs.token}}
 
     - name: Extract branch name
       id: extract_branch
@@ -28,7 +30,7 @@ runs:
     - name: Generate next version
       id: nextVersion
       if: steps.latestTag.outcome == 'success'
-      run: echo "version=$(${GITHUB_ACTION_PATH}/dist/version ${{ steps.extract_branch.outputs.branch }} ${{ steps.latestTag.outputs.release }} ${{ steps.breakingChange.outputs.changed }})" >> $GITHUB_OUTPUT
+      run: echo "version=$(${GITHUB_ACTION_PATH}/dist/version ${{ steps.extract_branch.outputs.branch }} ${{ steps.latestTag.outputs.tag }} ${{ steps.breakingChange.outputs.changed }})" >> $GITHUB_OUTPUT
       shell: sh
 
     - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
@@ -82,5 +84,5 @@ inputs:
 
 outputs:
   releaseVersion:
-    value: ${{ steps.nextVersion.outputs.version }}
+    value: ${{ steps.nextVersion.outputs.version || '0.1.0' }}
     description: latest release version
