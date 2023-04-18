@@ -82,5 +82,5 @@ inputs:
 
 outputs:
   releaseVersion:
-    value: ${{ steps.release.outputs.automatic_releases_tag }}
+    value: ${{ steps.nextVersion.outputs.version }}
     description: latest release version
