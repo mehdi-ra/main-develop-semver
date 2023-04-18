@@ -1,0 +1,66 @@
+name: "Branch based semver release"
+description: "Release based on main and develop branch"
+author: Mehdi Rahimi <mehdirahimi.dev@gmail.com>
+runs:
+  using: composite
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      with:
+        fetch-depth: 0
+
+    - name: Breaking change detect
+      id: breakingChange
+      uses: younited/detect-branch-changes-action@2e19843d8deeb25dc21dd0a1c4b1c9a41e85bd46
+
+    - name: Get latest tag
+      id: latestTag
+      uses: pozetroninc/github-action-get-latest-release@d1dafdb6e338bdab109e6afce581a01858680dfb
+      with:
+        repository: ${{ inputs.repository }}
+
+    - name: Extract branch name
+      id: extract_branch
+      run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Generate next version
+      id: nextVersion
+      run: echo "version=$(./version ${{ steps.extract_branch.outputs.branch }} ${{ steps.latestTag.outputs.release }} ${{ steps.breakingChange.outputs.changed }})" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
+      if: steps.extract_branch.outputs.branch == 'develop'
+      with:
+        repo_token: ${{ inputs.token }}
+        prerelease: true
+        automatic_release_tag: v${{ steps.nextVersion.outputs.version }}
+        title: "${{inputs.releaseTitle}} v${{ steps.nextVersion.outputs.version }}"
+
+    - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
+      if: steps.extract_branch.outputs.branch == 'main'
+      with:
+        repo_token: "${{ inputs.token }}"
+        prerelease: false
+        automatic_release_tag: v${{ steps.nextVersion.outputs.version }}
+        title: "${{inputs.releaseTitle}} v${{ steps.nextVersion.outputs.version }}"
+
+inputs:
+  repository:
+    required: false
+    description: Target repository
+    default: ${{ github.repository }}
+
+  releaseTitle:
+    required: false
+    default: Auto Release
+    description: Release title
+
+  token:
+    required: true
+    description: Github token for releasing
+
+outputs:
+  latestRelease:
+    value: ${{ steps.latestTag.outputs.release }}
+    description: latest release version
