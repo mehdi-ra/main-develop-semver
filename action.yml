@@ -1,4 +1,4 @@
-name: "Branch based semver release"
+name: Main, Develop branches semantic release
 description: "Release based on main and develop branch"
 author: Mehdi Rahimi <mehdirahimi.dev@gmail.com>
 runs:
