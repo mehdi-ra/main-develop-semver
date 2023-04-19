@@ -26,8 +26,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Do not use versions below 1.6.0
       - name: Release
-        uses: mehdi-ra/main-develop-semver@v1.2.0
+        uses: mehdi-ra/main-develop-semver@v1.6.0
         with:
           token: ${{secrets.GITHUB_TOKEN}}
           releaseTitle: Auto release
