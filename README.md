@@ -26,8 +26,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Do not use versions below 1.6.0
       - name: Release
-        uses: mehdi-ra/main-develop-semver@a72752066126879a5ca505f0d0a733ed9e9602e1
+        uses: mehdi-ra/main-develop-semver@v1.6.0
         with:
           token: ${{secrets.GITHUB_TOKEN}}
           releaseTitle: Auto release
@@ -47,6 +48,6 @@ jobs:
 | -------------- | ------------------------ |
 | releaseVersion | Token for making release |
 
-## What happens without any previous release?
+## Version fall back
 
-When You add this action to your repository it automatically creates a release with a tag and version v0.1.0. Make sure you are aware of this.
+If the action does not detect any change then creates a release with tag `v0.1.0`

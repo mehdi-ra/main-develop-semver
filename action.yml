@@ -16,9 +16,11 @@ runs:
     - name: Get latest tag
       id: latestTag
       continue-on-error: true
-      uses: pozetroninc/github-action-get-latest-release@d1dafdb6e338bdab109e6afce581a01858680dfb
+      uses: oprypin/find-latest-tag@e1e0e606cc7e9ede25140a5a139b3a5a1b717ece
       with:
         repository: ${{ inputs.repository }}
+        releases-only: true
+        token: ${{inputs.token}}
 
     - name: Extract branch name
       id: extract_branch
@@ -28,7 +30,7 @@ runs:
     - name: Generate next version
       id: nextVersion
       if: steps.latestTag.outcome == 'success'
-      run: echo "version=$(${GITHUB_ACTION_PATH}/dist/version ${{ steps.extract_branch.outputs.branch }} ${{ steps.latestTag.outputs.release }} ${{ steps.breakingChange.outputs.changed }})" >> $GITHUB_OUTPUT
+      run: echo "version=$(${GITHUB_ACTION_PATH}/dist/version ${{ steps.extract_branch.outputs.branch }} ${{ steps.latestTag.outputs.tag }} ${{ steps.breakingChange.outputs.changed }})" >> $GITHUB_OUTPUT
       shell: sh
 
     - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
@@ -65,6 +67,26 @@ runs:
         automatic_release_tag: v0.1.0
         title: "${{inputs.releaseTitle}} v0.1.0"
 
+    # Event dispatching ------------------------------------------------------
+
+    - name: Dispatch event for new version
+      if: steps.nextVersion.outputs.version != ''
+      uses: peter-evans/repository-dispatch@26b39ed245ab8f31526069329e112ab2fb224588
+      with:
+        token: ${{ inputs.token }}
+        repository: ${{ inputs.eventScope }}
+        eventType: ${{ inputs.eventType }}-${{  }}
+        client-payload: ${{ inputs.eventPayload }}
+
+    - name: Dispatch event, fallback
+      if: steps.nextVersion.outputs.version == ''
+      uses: peter-evans/repository-dispatch@26b39ed245ab8f31526069329e112ab2fb224588
+      with:
+        token: ${{ inputs.token }}
+        repository: ${{ inputs.eventScope }}
+        eventType: ${{ inputs.eventType }}-v0.1.0
+        client-payload: ${{ inputs.eventPayload }}
+
 inputs:
   repository:
     required: false
@@ -80,7 +102,21 @@ inputs:
     required: true
     description: Github token for releasing
 
+  eventType:
+    required: false
+    description: Event that will be dispatched
+    default: ${{ github.repository.name }}
+
+  eventScope:
+    required: false
+    description: The scope of event dispatch
+
+  eventPayload:
+    required: false
+    description: JSON event payload witch will be sent to scope or repositories
+    default: "{}"
+
 outputs:
   releaseVersion:
-    value: ${{ steps.nextVersion.outputs.version }}
+    value: ${{ steps.nextVersion.outputs.version || '0.1.0' }}
     description: latest release version

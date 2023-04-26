@@ -18,7 +18,11 @@ jobs:
           fetch-depth: 0
 
       - name: Release
-        uses: mehdi-ra/main-develop-semver@20e58ca843a8261223bd9b61ba37462da2b9ca71
+        uses: mehdi-ra/main-develop-semver@v1.2.0
+        id: release
         with:
           token: ${{secrets.GITHUB_TOKEN}}
           releaseTitle: Auto release
+
+      - name: Echo release version
+        run: echo ${{ steps.release.outputs.releaseVersion }}
