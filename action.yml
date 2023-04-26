@@ -67,6 +67,26 @@ runs:
         automatic_release_tag: v0.1.0
         title: "${{inputs.releaseTitle}} v0.1.0"
 
+    # Event dispatching ------------------------------------------------------
+
+    - name: Dispatch event for new version
+      if: steps.nextVersion.outputs.version != ''
+      uses: peter-evans/repository-dispatch@26b39ed245ab8f31526069329e112ab2fb224588
+      with:
+        token: ${{ inputs.token }}
+        repository: ${{ inputs.eventScope }}
+        eventType: ${{ inputs.eventType }}-${{  }}
+        client-payload: ${{ inputs.eventPayload }}
+
+    - name: Dispatch event, fallback
+      if: steps.nextVersion.outputs.version == ''
+      uses: peter-evans/repository-dispatch@26b39ed245ab8f31526069329e112ab2fb224588
+      with:
+        token: ${{ inputs.token }}
+        repository: ${{ inputs.eventScope }}
+        eventType: ${{ inputs.eventType }}-v0.1.0
+        client-payload: ${{ inputs.eventPayload }}
+
 inputs:
   repository:
     required: false
@@ -81,6 +101,20 @@ inputs:
   token:
     required: true
     description: Github token for releasing
+
+  eventType:
+    required: false
+    description: Event that will be dispatched
+    default: ${{ github.repository.name }}
+
+  eventScope:
+    required: false
+    description: The scope of event dispatch
+
+  eventPayload:
+    required: false
+    description: JSON event payload witch will be sent to scope or repositories
+    default: "{}"
 
 outputs:
   releaseVersion:
