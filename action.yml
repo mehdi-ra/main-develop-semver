@@ -11,7 +11,7 @@ runs:
 
     - name: Breaking change detect
       id: breakingChange
-      uses: younited/detect-branch-changes-action@2e19843d8deeb25dc21dd0a1c4b1c9a41e85bd46
+      uses: younited/detect-branch-changes-action@bc691b43a8deea1d1b01ffd272209478529bf636
 
     - name: Get latest tag
       id: latestTag
