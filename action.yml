@@ -43,7 +43,7 @@ runs:
         repo_token: "${{ inputs.token }}"
         prerelease: false
         automatic_release_tag: v${{ steps.nextVersion.outputs.version }}
-        title: "${{inputs.releaseTitle}} v${{ steps.nextVersion.outputs.version }}"
+        title: "${{inputs.releaseTitle}} v${{ steps.nextVersion.outputs.version }} false"
 
     # If there was any previous release ===============================================================
 
