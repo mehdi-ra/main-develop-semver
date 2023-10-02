@@ -9,10 +9,6 @@ runs:
       with:
         fetch-depth: 0
 
-    - name: Breaking change detect
-      id: breakingChange
-      uses: younited/detect-branch-changes-action@bc691b43a8deea1d1b01ffd272209478529bf636
-
     - name: Get latest tag
       id: latestTag
       continue-on-error: true
@@ -30,7 +26,7 @@ runs:
     - name: Generate next version
       id: nextVersion
       if: steps.latestTag.outcome == 'success'
-      run: echo "version=$(${GITHUB_ACTION_PATH}/dist/version ${{ steps.extract_branch.outputs.branch }} ${{ steps.latestTag.outputs.tag }} ${{ steps.breakingChange.outputs.changed }})" >> $GITHUB_OUTPUT
+      run: echo "version=$(${GITHUB_ACTION_PATH}/dist/version ${{ steps.extract_branch.outputs.branch }} ${{ steps.latestTag.outputs.tag }})" >> $GITHUB_OUTPUT
       shell: sh
 
     - uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0"
